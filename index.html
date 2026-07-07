@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Japanese Vocab Estimator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="panel quiz-panel" aria-labelledby="app-title">
+        <div class="topbar">
+          <div>
+            <p class="eyebrow">Japanese vocab estimator</p>
+            <h1 class="brand-title" id="app-title">
+              <span>単語</span>
+              <span>ELO</span>
+            </h1>
+          </div>
+          <button class="ghost-button" id="resetButton" type="button">Reset</button>
+        </div>
+
+        <div class="rating-strip" aria-label="Current rating summary">
+          <div>
+            <span class="stat-label">Vocab Elo</span>
+            <strong class="rating-line">
+              <span id="ratingValue">Calibrating</span>
+              <span class="rating-delta hidden" id="ratingDeltaValue"></span>
+            </strong>
+          </div>
+          <div>
+            <span class="stat-label">Level estimate</span>
+            <strong id="bandValue">N5</strong>
+          </div>
+          <div>
+            <span class="stat-label">Known words approx.</span>
+            <strong id="knownWordsValue">Calibrating</strong>
+          </div>
+          <div>
+            <span class="stat-label">Confidence</span>
+            <strong id="confidenceValue">Low</strong>
+          </div>
+        </div>
+
+        <div class="rating-strip kanji-strip" aria-label="Kanji literacy summary">
+          <div>
+            <span class="stat-label">Kanji Elo</span>
+            <strong class="rating-line">
+              <span id="kanjiRatingValue">Calibrating</span>
+              <span class="rating-delta hidden" id="kanjiDeltaValue"></span>
+            </strong>
+          </div>
+          <div>
+            <span class="stat-label">Kanji level</span>
+            <strong id="kanjiBandValue">Calibrating</strong>
+          </div>
+          <div>
+            <span class="stat-label">Readable words approx.</span>
+            <strong id="readableWordsValue">Calibrating</strong>
+          </div>
+        </div>
+
+        <div class="word-card">
+          <div class="word-meta">
+            <span id="wordLevel">Common word</span>
+            <span id="wordRating">Word rating 1000</span>
+          </div>
+          <p class="prompt" id="cardPrompt">Can you read this word?</p>
+          <div class="japanese" id="japaneseWord">...</div>
+          <div class="reading" id="reading">Loading word</div>
+          <div class="meaning hidden" id="meaning">meaning</div>
+        </div>
+
+        <div class="action-dock">
+          <div class="actions" id="readingRevealActions">
+            <button class="secondary-button" id="revealReadingButton" type="button">Show reading</button>
+          </div>
+
+          <div class="actions hidden" id="readingActions">
+            <button class="danger-button" id="missReadingButton" type="button">Missed reading</button>
+            <button class="primary-button" id="knowReadingButton" type="button">Knew reading</button>
+          </div>
+
+          <div class="actions hidden" id="mainActions">
+            <button class="secondary-button" id="revealButton" type="button">Show meaning</button>
+          </div>
+
+          <div class="actions hidden" id="answerActions">
+            <button class="danger-button" id="missButton" type="button">I missed it</button>
+            <button class="primary-button" id="knowButton" type="button">I knew it</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel side-panel" aria-label="Session details">
+        <section>
+          <h2>How it works</h2>
+          <p>
+            Each word has an estimated frequency rank. You gain more for knowing rarer
+            words, lose more for missing common words, and the app chooses words near
+            your current rating so the estimate can settle.
+          </p>
+        </section>
+
+        <section>
+          <div class="meter-header">
+            <h2>Word estimate</h2>
+            <span id="rangeValue">Answer 10 more to estimate</span>
+          </div>
+          <div class="level-scale" id="levelScale"></div>
+          <p class="source-note">
+            Estimate bands are based on approximate frequency coverage, not JLPT level.
+            JLPT and media labels are used as word metadata only.
+          </p>
+        </section>
+
+        <section class="meter-section">
+          <div class="meter-header">
+            <h2>Session</h2>
+            <span id="answeredValue">0 answered</span>
+          </div>
+          <div class="meter" aria-hidden="true">
+            <div id="accuracyBar"></div>
+          </div>
+          <p id="accuracyValue">No answers yet</p>
+        </section>
+
+        <section>
+          <h2>Recent answers</h2>
+          <ol class="history" id="historyList">
+            <li class="empty">Your answers will appear here.</li>
+          </ol>
+        </section>
+
+        <section class="export-section">
+          <div class="meter-header">
+            <h2>Your profile</h2>
+            <span id="wordBankValue">1,183 leveled seed words</span>
+          </div>
+          <textarea id="profileOutput" readonly aria-label="Profile export"></textarea>
+          <button class="secondary-button full-width" id="copyButton" type="button">
+            Copy profile
+          </button>
+        </section>
+      </aside>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
