@@ -11,11 +11,17 @@
       <section class="panel quiz-panel" aria-labelledby="app-title">
         <div class="topbar">
           <div>
-            <p class="eyebrow">Japanese vocab estimator</p>
             <h1 class="brand-title" id="app-title">
               <span>単語</span>
               <span>ELO</span>
             </h1>
+            <div class="header-status">
+            <div class="confidence-pill" aria-label="Elo confidence">
+              <span>Elo Confidence</span>
+              <strong id="confidenceValue">Low</strong>
+            </div>
+              <p class="calibration-hint" id="calibrationHint">Play 10 rounds to show your rank</p>
+            </div>
           </div>
           <button class="ghost-button" id="resetButton" type="button">Reset</button>
         </div>
@@ -28,17 +34,17 @@
               <span class="rating-delta hidden" id="ratingDeltaValue"></span>
             </strong>
           </div>
-          <div>
-            <span class="stat-label">Level estimate</span>
-            <strong id="bandValue">N5</strong>
+          <div class="rank-stat">
+            <span class="stat-label">Rank estimate</span>
+            <strong class="rank-value" id="bandValue">Calibrating</strong>
           </div>
           <div>
             <span class="stat-label">Known words approx.</span>
             <strong id="knownWordsValue">Calibrating</strong>
           </div>
           <div>
-            <span class="stat-label">Confidence</span>
-            <strong id="confidenceValue">Low</strong>
+            <span class="stat-label">Coverage approx.</span>
+            <strong id="coverageValue">Calibrating</strong>
           </div>
         </div>
 
@@ -50,13 +56,17 @@
               <span class="rating-delta hidden" id="kanjiDeltaValue"></span>
             </strong>
           </div>
-          <div>
-            <span class="stat-label">Kanji level</span>
-            <strong id="kanjiBandValue">Calibrating</strong>
+          <div class="rank-stat">
+            <span class="stat-label">Kanji rank</span>
+            <strong class="rank-value" id="kanjiBandValue">Calibrating</strong>
           </div>
           <div>
             <span class="stat-label">Readable words approx.</span>
             <strong id="readableWordsValue">Calibrating</strong>
+          </div>
+          <div>
+            <span class="stat-label">Kanji coverage approx.</span>
+            <strong id="kanjiCoverageValue">Calibrating</strong>
           </div>
         </div>
 
@@ -92,6 +102,8 @@
         </div>
       </section>
 
+      <div class="achievement-stack" id="achievementStack" aria-live="polite"></div>
+
       <aside class="panel side-panel" aria-label="Session details">
         <section>
           <h2>How it works</h2>
@@ -109,8 +121,9 @@
           </div>
           <div class="level-scale" id="levelScale"></div>
           <p class="source-note">
-            Estimate bands are based on approximate frequency coverage, not JLPT level.
-            JLPT and media labels are used as word metadata only.
+            Known words are estimated from your frequency-rank Elo.
+            Coverage is extrapolated from rough frequency anchors.
+            Everyday/media/prose ranks are averaged when available; Wikipedia is only a fallback.
           </p>
         </section>
 
@@ -135,7 +148,7 @@
         <section class="export-section">
           <div class="meter-header">
             <h2>Your profile</h2>
-            <span id="wordBankValue">1,183 leveled seed words</span>
+            <span id="wordBankValue">1,290 leveled seed words</span>
           </div>
           <textarea id="profileOutput" readonly aria-label="Profile export"></textarea>
           <button class="secondary-button full-width" id="copyButton" type="button">
@@ -145,6 +158,12 @@
       </aside>
     </main>
 
+    <script src="wiktionary-frequency-data.js"></script>
+    <script src="anime-jdrama-frequency-data.js"></script>
+    <script src="aozora-frequency-data.js"></script>
+    <script src="youtube-frequency-data.js"></script>
+    <script src="additional-frequency-data.js"></script>
+    <script src="jmdict-frequency-data.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
