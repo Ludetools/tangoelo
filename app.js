@@ -1,11 +1,21 @@
 const estimateBands = [
-  { level: "New Learner", minRating: 350, maxRating: 650, minWords: 0, maxWords: 500 },
-  { level: "Beginner", minRating: 650, maxRating: 950, minWords: 500, maxWords: 1500 },
-  { level: "Elementary", minRating: 950, maxRating: 1250, minWords: 1500, maxWords: 3000 },
-  { level: "Intermediate", minRating: 1250, maxRating: 1650, minWords: 3000, maxWords: 6000 },
-  { level: "Advanced", minRating: 1650, maxRating: 2150, minWords: 6000, maxWords: 10000 },
-  { level: "Very Advanced", minRating: 2150, maxRating: 2750, minWords: 10000, maxWords: 15000 },
-  { level: "Native-like", minRating: 2750, maxRating: 3400, minWords: 15000, maxWords: 25000 }
+  { level: "Rookie", tier: "rookie", minRating: 350, maxRating: 650, minWords: 0, maxWords: 500 },
+  { level: "Bronze", tier: "bronze", minRating: 650, maxRating: 950, minWords: 500, maxWords: 1500 },
+  { level: "Silver", tier: "silver", minRating: 950, maxRating: 1250, minWords: 1500, maxWords: 3000 },
+  { level: "Gold", tier: "gold", minRating: 1250, maxRating: 1650, minWords: 3000, maxWords: 6000 },
+  { level: "Platinum", tier: "platinum", minRating: 1650, maxRating: 2150, minWords: 6000, maxWords: 10000 },
+  { level: "Diamond", tier: "diamond", minRating: 2150, maxRating: 2650, minWords: 10000, maxWords: 20000 },
+  { level: "Master", tier: "master", minRating: 2650, maxRating: 3100, minWords: 20000, maxWords: 30000 },
+  { level: "Grandmaster", tier: "grandmaster", minRating: 3100, maxRating: 3800, minWords: 30000, maxWords: 75000 },
+  { level: "Legend", tier: "legend", minRating: 3800, maxRating: 4200, minWords: 75000, maxWords: 120000 }
+];
+
+const coverageAnchors = [
+  { words: 1000, coverage: 68 },
+  { words: 2000, coverage: 76 },
+  { words: 5000, coverage: 86 },
+  { words: 10000, coverage: 92 },
+  { words: 120000, coverage: 100 }
 ];
 
 const levelFrequencyProfiles = {
@@ -17,6 +27,13 @@ const levelFrequencyProfiles = {
   N1: { minRank: 8000, maxRank: 19000 },
   "Beyond N1": { minRank: 12000, maxRank: 25000 }
 };
+
+const wiktionaryFrequencyRankByWord = window.wiktionaryFrequencyRanks || {};
+const animeFrequencyRankByWord = window.animeJdramaFrequencyRanks || {};
+const aozoraFrequencyRankByWord = window.aozoraFrequencyRanks || {};
+const youtubeFrequencyRankByWord = window.youtubeFrequencyRanks || {};
+const additionalFrequencyRankByWord = window.additionalFrequencyRanks || {};
+const dictionaryEntryByWord = window.jmdictFrequencyEntries || {};
 
 const vocabByLevel = {
   "Pre-N5": [
@@ -1343,13 +1360,269 @@ const extraVocabByLevel = {
   ]
 };
 
+const broadVocabByLevel = {
+  "Pre-N5": [
+    ["今回", "こんかい", "this time"],
+    ["前回", "ぜんかい", "last time"],
+    ["毎回", "まいかい", "every time"],
+    ["最近", "さいきん", "recently"],
+    ["最後", "さいご", "last; final"],
+    ["最初", "さいしょ", "first; beginning"],
+    ["理由", "りゆう", "reason"],
+    ["感じ", "かんじ", "feeling"],
+    ["形", "かたち", "shape; form"],
+    ["場所", "ばしょ", "place"],
+    ["場合", "ばあい", "case; situation"],
+    ["頃", "ころ", "around; time"],
+    ["途中", "とちゅう", "on the way"],
+    ["普通", "ふつう", "normal"],
+    ["特別", "とくべつ", "special"]
+  ],
+  N5: [
+    ["伝える", "つたえる", "to convey"],
+    ["続く", "つづく", "to continue"],
+    ["続ける", "つづける", "to continue something"],
+    ["受ける", "うける", "to receive; take"],
+    ["送る", "おくる", "to send"],
+    ["選ぶ", "えらぶ", "to choose"],
+    ["増える", "ふえる", "to increase"],
+    ["減る", "へる", "to decrease"],
+    ["足りる", "たりる", "to be enough"],
+    ["足す", "たす", "to add"],
+    ["直る", "なおる", "to be fixed"],
+    ["直す", "なおす", "to fix"],
+    ["謝る", "あやまる", "to apologize"],
+    ["頼む", "たのむ", "to ask; request"],
+    ["笑顔", "えがお", "smile"],
+    ["約束", "やくそく", "promise"],
+    ["用事", "ようじ", "errand; business"],
+    ["予定", "よてい", "plan; schedule"],
+    ["連絡", "れんらく", "contact"],
+    ["返事", "へんじ", "reply"]
+  ],
+  N4: [
+    ["理解", "りかい", "understanding"],
+    ["納得", "なっとく", "acceptance; understanding"],
+    ["確認", "かくにん", "confirmation"],
+    ["想像", "そうぞう", "imagination"],
+    ["期待", "きたい", "expectation"],
+    ["緊張", "きんちょう", "nervousness; tension"],
+    ["感謝", "かんしゃ", "gratitude"],
+    ["尊敬", "そんけい", "respect"],
+    ["反省", "はんせい", "reflection; regret"],
+    ["後悔", "こうかい", "regret"],
+    ["相談", "そうだん", "consultation"],
+    ["報告", "ほうこく", "report"],
+    ["発見", "はっけん", "discovery"],
+    ["発表", "はっぴょう", "announcement"],
+    ["表情", "ひょうじょう", "facial expression"],
+    ["感覚", "かんかく", "sense; feeling"],
+    ["性格", "せいかく", "personality"],
+    ["態度", "たいど", "attitude"],
+    ["関心", "かんしん", "interest"],
+    ["印象", "いんしょう", "impression"]
+  ],
+  N3: [
+    ["意図", "いと", "intention"],
+    ["判断", "はんだん", "judgment"],
+    ["決断", "けつだん", "decision"],
+    ["選択肢", "せんたくし", "option; choice"],
+    ["状況", "じょうきょう", "situation"],
+    ["状態", "じょうたい", "condition; state"],
+    ["変化", "へんか", "change"],
+    ["進化", "しんか", "evolution"],
+    ["成長", "せいちょう", "growth"],
+    ["発展", "はってん", "development"],
+    ["経験", "けいけん", "experience"],
+    ["記憶", "きおく", "memory"],
+    ["感情", "かんじょう", "emotion"],
+    ["衝動", "しょうどう", "impulse"],
+    ["欲望", "よくぼう", "desire"],
+    ["意志", "いし", "will; intention"],
+    ["覚悟", "かくご", "resolve"],
+    ["努力", "どりょく", "effort"],
+    ["才能", "さいのう", "talent"],
+    ["可能性", "かのうせい", "possibility"]
+  ],
+  N2: [
+    ["葛藤", "かっとう", "inner conflict"],
+    ["執着", "しゅうちゃく", "attachment; obsession"],
+    ["依存", "いぞん", "dependence"],
+    ["矛盾", "むじゅん", "contradiction"],
+    ["本質", "ほんしつ", "essence"],
+    ["抽象", "ちゅうしょう", "abstraction"],
+    ["主観", "しゅかん", "subjectivity"],
+    ["客観", "きゃっかん", "objectivity"],
+    ["偏見", "へんけん", "prejudice"],
+    ["価値観", "かちかん", "values"],
+    ["世界観", "せかいかん", "worldview"],
+    ["倫理", "りんり", "ethics"],
+    ["道徳", "どうとく", "morality"],
+    ["概念", "がいねん", "concept"],
+    ["象徴", "しょうちょう", "symbol"],
+    ["比喩", "ひゆ", "metaphor"],
+    ["伏線", "ふくせん", "foreshadowing"],
+    ["描写", "びょうしゃ", "description; depiction"],
+    ["視線", "しせん", "line of sight"],
+    ["気配", "けはい", "presence; sign"]
+  ],
+  N1: [
+    ["叙述", "じょじゅつ", "description; narration"],
+    ["余韻", "よいん", "aftertaste; lingering impression"],
+    ["情緒", "じょうちょ", "emotion; atmosphere"],
+    ["趣", "おもむき", "flavor; charm"],
+    ["風情", "ふぜい", "taste; elegance"],
+    ["機微", "きび", "subtlety"],
+    ["示唆", "しさ", "implication"],
+    ["暗示", "あんじ", "hint; suggestion"],
+    ["兆候", "ちょうこう", "sign; omen"],
+    ["余地", "よち", "room; scope"],
+    ["余儀ない", "よぎない", "unavoidable"],
+    ["齟齬", "そご", "discrepancy"],
+    ["乖離", "かいり", "divergence; separation"],
+    ["葛藤", "かっとう", "conflict"],
+    ["脆さ", "もろさ", "fragility"],
+    ["儚さ", "はかなさ", "transience"],
+    ["憂い", "うれい", "sorrow; anxiety"],
+    ["憂鬱", "ゆううつ", "melancholy"],
+    ["苛立ち", "いらだち", "irritation"],
+    ["諦念", "ていねん", "resignation"]
+  ],
+  "Beyond N1": [
+    ["春夏秋冬", "しゅんかしゅうとう", "the four seasons"],
+    ["諸行無常", "しょぎょうむじょう", "impermanence"],
+    ["色即是空", "しきそくぜくう", "form is emptiness"],
+    ["盛者必衰", "じょうしゃひっすい", "the mighty must fall"],
+    ["有為転変", "ういてんぺん", "vicissitudes of life"],
+    ["栄枯盛衰", "えいこせいすい", "rise and fall"],
+    ["孤軍奮闘", "こぐんふんとう", "fighting alone"],
+    ["乾坤一擲", "けんこんいってき", "do-or-die gamble"],
+    ["起承転結", "きしょうてんけつ", "narrative structure"],
+    ["百戦錬磨", "ひゃくせんれんま", "veteran; battle-hardened"],
+    ["千変万化", "せんぺんばんか", "ever-changing"],
+    ["森羅万象", "しんらばんしょう", "all things in nature"],
+    ["因果律", "いんがりつ", "law of causality"],
+    ["因果応報", "いんがおうほう", "karma"],
+    ["明鏡止水", "めいきょうしすい", "clear, serene mind"],
+    ["行雲流水", "こううんりゅうすい", "going with the flow"],
+    ["花鳥風月", "かちょうふうげつ", "beauties of nature"],
+    ["鏡花水月", "きょうかすいげつ", "unattainable beauty"],
+    ["幽寂", "ゆうじゃく", "deep quiet"],
+    ["幽玄", "ゆうげん", "mysterious profundity"]
+  ]
+};
+
+const mediaFrequencyRankByWord = {
+  僕: 450,
+  俺: 650,
+  君: 850,
+  お前: 1200,
+  奴: 1800,
+  本当: 700,
+  嘘: 1200,
+  好き: 850,
+  嫌い: 1300,
+  強い: 1100,
+  弱い: 1450,
+  怖い: 1200,
+  死ぬ: 1500,
+  殺す: 2300,
+  助ける: 1600,
+  守る: 1900,
+  戦う: 2200,
+  勝つ: 1500,
+  負ける: 1700,
+  笑う: 1400,
+  先輩: 2800,
+  後輩: 4200,
+  部活: 3800,
+  放課後: 4800,
+  幼なじみ: 6200,
+  事件: 2600,
+  秘密: 2400,
+  夢: 1300,
+  涙: 2100,
+  笑顔: 2500,
+  命: 2100,
+  心: 1000,
+  敵: 2200,
+  味方: 3300,
+  仲間: 3000,
+  勇気: 3000,
+  運命: 4300,
+  魔法: 4600,
+  剣: 4200,
+  悪魔: 5600,
+  気配: 5200,
+  影: 2500,
+  光: 1600,
+  炎: 4500,
+  傷: 3000,
+  血: 2600,
+  痛み: 2800,
+  恐怖: 4200,
+  怒り: 3600,
+  悲しみ: 3900,
+  願い: 3400,
+  祈り: 5000,
+  声: 1200,
+  姿: 3100,
+  奇跡: 5200,
+  絶対: 2200,
+  限界: 4400,
+  本気: 3600,
+  覚悟: 5600,
+  誓う: 5800,
+  狙う: 4700,
+  殴る: 5200,
+  斬る: 7200,
+  撃つ: 5200,
+  倒す: 3800,
+  迫る: 5200,
+  抗う: 9000,
+  彷徨う: 11000,
+  狂気: 8500,
+  殺意: 7600,
+  悪意: 6200,
+  孤独: 5400,
+  絶体絶命: 11000,
+  因果: 10000,
+  呪文: 7800,
+  魔力: 8200,
+  霊: 6200,
+  妖怪: 8500,
+  魔物: 7800,
+  葬る: 10500,
+  滅ぼす: 9000,
+  勇者: 7800,
+  魔王: 9800,
+  王国: 5200,
+  帝国: 7200,
+  騎士: 7600,
+  召喚: 8600,
+  転生: 9000,
+  復活: 5200,
+  結界: 12500,
+  詠唱: 13000,
+  呪縛: 13500,
+  深淵: 14500,
+  魑魅魍魎: 24000,
+  百鬼夜行: 22000,
+  黄泉: 17000,
+  冥府: 20000,
+  奈落: 18000,
+  幽体離脱: 22000,
+  因果律崩壊: 28000
+};
+
 for (const source of [
   supplementalVocabByLevel,
   expandedVocabByLevel,
   mediaVocabByLevel,
   fictionVocabByLevel,
   genreVocabByLevel,
-  extraVocabByLevel
+  extraVocabByLevel,
+  broadVocabByLevel
 ]) {
   for (const [level, entries] of Object.entries(source)) {
     const existing = new Set(vocabByLevel[level].map(([jp]) => jp));
@@ -1361,18 +1634,241 @@ for (const source of [
   }
 }
 
-const words = Object.entries(vocabByLevel).flatMap(([level, entries]) => {
-  const profile = levelFrequencyProfiles[level];
-  const step = (profile.maxRank - profile.minRank) / Math.max(1, entries.length - 1);
-  return entries.map(([jp, reading, meaning], index) => ({
+const curatedWords = Object.entries(vocabByLevel)
+  .flatMap(([level, entries]) => {
+    const profile = levelFrequencyProfiles[level];
+    const step = (profile.maxRank - profile.minRank) / Math.max(1, entries.length - 1);
+    return entries.map(([jp, reading, meaning], index) => {
+      const baseRank = profile.minRank + step * index;
+      const frequencyRank = balancedFrequencyRank(baseRank, jp, reading, meaning, level);
+      return {
+        jp,
+        reading,
+        meaning,
+        level,
+        frequencyRank,
+        rating: ratingForKnownWords(frequencyRank),
+        source: "curated"
+      };
+    });
+  })
+  .filter((word) => !isSingleKanaEntry(word.jp));
+
+const generatedKanaStopWords = new Set([
+  "の",
+  "に",
+  "は",
+  "を",
+  "が",
+  "と",
+  "て",
+  "で",
+  "へ",
+  "も",
+  "や",
+  "か",
+  "ば",
+  "た",
+  "だ",
+  "さ",
+  "ら",
+  "ん",
+  "ぬ"
+]);
+
+const commonKanaWords = new Set([
+  "する",
+  "ある",
+  "いる",
+  "なる",
+  "ない",
+  "これ",
+  "それ",
+  "ため",
+  "から",
+  "よう",
+  "まで",
+  "など",
+  "また",
+  "もの"
+]);
+
+const curatedWordSet = new Set(curatedWords.map((word) => word.jp));
+const frequencyCandidateRanks = new Map([
+  ...Object.entries(wiktionaryFrequencyRankByWord),
+  ...Object.entries(animeFrequencyRankByWord),
+  ...Object.entries(aozoraFrequencyRankByWord),
+  ...Object.entries(youtubeFrequencyRankByWord),
+  ...Object.entries(additionalFrequencyRankByWord)
+]);
+const frequencyOnlyWords = [...frequencyCandidateRanks.entries()]
+  .filter(([jp]) =>
+    !curatedWordSet.has(jp) && isReliableFrequencyCard(jp, dictionaryEntryByWord[jp], preferredEverydayRank(jp))
+  )
+  .map(([jp]) => {
+    const frequencyRank = adjustedFrequencyRankForEntry(preferredFrequencyRank(jp), jp, dictionaryEntryByWord[jp]);
+    return {
     jp,
-    reading,
-    meaning,
-    level,
-    frequencyRank: Math.round(profile.minRank + step * index),
-    rating: ratingForKnownWords(profile.minRank + step * index)
-  }));
-});
+    reading: dictionaryEntryByWord[jp].reading,
+    meaning: dictionaryEntryByWord[jp].meaning,
+    level: levelForFrequencyRank(frequencyRank),
+    frequencyRank,
+    rating: ratingForKnownWords(frequencyRank),
+    source: frequencySource(jp)
+    };
+  });
+
+const words = [...curatedWords, ...frequencyOnlyWords].sort((a, b) => a.frequencyRank - b.frequencyRank);
+const wordsByRating = [...words].sort((a, b) => a.rating - b.rating);
+
+function isJapaneseTerm(term) {
+  return /[\u3040-\u30ff\u4e00-\u9fff]/.test(term) && !/[A-Za-z]/.test(term);
+}
+
+function isReliableFrequencyCard(term, entry, everydayRank) {
+  if (!entry || !isJapaneseTerm(term)) return false;
+  if (isSingleKanaEntry(term)) return false;
+  if (entry.properNoun || entry.grammarOnly) return false;
+  if (generatedKanaStopWords.has(term)) return false;
+  if (isKanaOnly(term) && [...term].length <= 2 && !commonKanaWords.has(term) && (!everydayRank || everydayRank > 1000)) {
+    return false;
+  }
+  if (looksLikeKatakanaName(term, entry.meaning)) return false;
+  if (looksLikeNameOrPlace(entry.meaning)) return false;
+  return everydayRank ? everydayRank <= 100000 : entry.commonScore >= 3;
+}
+
+function looksLikeNameOrPlace(meaning) {
+  return /\b(surname|given name|place name|company|corporation|prefecture|city|town|village|station|Ltd)\b/i.test(
+    meaning
+  );
+}
+
+function looksLikeKatakanaName(term, meaning) {
+  return /^[\u30a0-\u30ffー]+$/.test(term) && /\b[A-Z][a-z]{2,}\b/.test(meaning);
+}
+
+function isKanaOnly(term) {
+  return /^[\u3040-\u309f\u30a0-\u30ffー]+$/.test(term);
+}
+
+function isSingleKanaEntry(term) {
+  return isKanaOnly(term) && [...term].length === 1;
+}
+
+function hasKanjiQuestion(word) {
+  return /[\u4e00-\u9fff]/.test(word.jp) && Boolean(word.reading);
+}
+
+function levelForFrequencyRank(rank) {
+  const level =
+    Object.entries(levelFrequencyProfiles).find(([, profile]) => rank >= profile.minRank && rank <= profile.maxRank)?.[0] ||
+    (rank < levelFrequencyProfiles["Pre-N5"].minRank ? "Pre-N5" : "Beyond N1");
+  return level;
+}
+
+function preferredEverydayRank(jp) {
+  const ranks = [
+    animeFrequencyRankByWord[jp],
+    aozoraFrequencyRankByWord[jp],
+    youtubeFrequencyRankByWord[jp],
+    additionalFrequencyRankByWord[jp]
+  ].filter(Number.isFinite);
+  if (ranks.length === 0) return null;
+  return Math.round(ranks.reduce((sum, rank) => sum + rank, 0) / ranks.length);
+}
+
+function preferredFrequencyRank(jp) {
+  return preferredEverydayRank(jp) || wiktionaryFrequencyRankByWord[jp] || 30000;
+}
+
+function adjustedFrequencyRankForEntry(rank, jp, entry) {
+  const textLength = [...jp].length;
+  const kanjiCount = (jp.match(/[\u4e00-\u9fff]/g) || []).length;
+  const meaning = entry?.meaning?.toLowerCase() || "";
+  let multiplier = 1;
+
+  if (isKanaOnly(jp) && textLength <= 4) multiplier *= 0.55;
+  if (textLength <= 2 && kanjiCount <= 1) multiplier *= 0.7;
+  if (kanjiCount === 0 && textLength <= 6) multiplier *= 0.8;
+  if (kanjiCount <= 1 && /(to |i; me|you|this|that|here|there|why|how|what|who)/.test(meaning)) {
+    multiplier *= 0.75;
+  }
+  if (meaning.includes("onomatopoeic") || meaning.includes("sound symbolic")) multiplier *= 0.85;
+  if (kanjiCount >= 3) multiplier *= 1.12;
+  if (textLength >= 6 && kanjiCount >= 2) multiplier *= 1.18;
+
+  return Math.round(clamp(rank * multiplier, 1, maxKnownWords()));
+}
+
+function frequencySource(jp) {
+  const sources = [
+    animeFrequencyRankByWord[jp] ? "anime" : null,
+    aozoraFrequencyRankByWord[jp] ? "aozora" : null,
+    youtubeFrequencyRankByWord[jp] ? "youtube" : null,
+    additionalFrequencyRankByWord[jp] ? "additional" : null
+  ].filter(Boolean);
+  if (sources.length > 0) return sources.join("+");
+  return "frequency";
+}
+
+function balancedFrequencyRank(baseRank, jp, reading, meaning, level) {
+  const jlptRank = adjustedFrequencyRank(baseRank, jp, reading, meaning, level);
+  const everydayRank = preferredEverydayRank(jp);
+  const wiktionaryRank = wiktionaryFrequencyRankByWord[jp];
+  const mediaRank = mediaFrequencyRankByWord[jp];
+  let blendedRank = jlptRank;
+  if (everydayRank) {
+    blendedRank = jlptRank * 0.25 + everydayRank * 0.75;
+    return Math.round(clamp(blendedRank, 1, 30000));
+  } else if (wiktionaryRank) {
+    blendedRank = jlptRank * 0.75 + wiktionaryRank * 0.25;
+  }
+  if (!mediaRank) return Math.round(clamp(blendedRank, 1, 30000));
+
+  const mediaWeightByLevel = {
+    "Pre-N5": 0.25,
+    N5: 0.3,
+    N4: 0.4,
+    N3: 0.45,
+    N2: 0.5,
+    N1: 0.55,
+    "Beyond N1": 0.6
+  };
+  const mediaWeight = mediaWeightByLevel[level] ?? 0.45;
+  blendedRank = blendedRank * (1 - mediaWeight) + mediaRank * mediaWeight;
+  blendedRank = Math.max(blendedRank, mediaRank * 0.75);
+  return Math.round(clamp(blendedRank, 1, 30000));
+}
+
+function adjustedFrequencyRank(baseRank, jp, reading, meaning, level) {
+  const kanaOnly = isKanaOnly(jp);
+  const kanjiCount = (jp.match(/[\u4e00-\u9fff]/g) || []).length;
+  const charCount = [...jp].length;
+  const meaningText = meaning.toLowerCase();
+  let multiplier = 1;
+
+  if (kanaOnly) multiplier *= 0.62;
+  if (charCount <= 2 && kanjiCount <= 1) multiplier *= 0.82;
+  if (["僕", "俺", "君", "お前", "本当", "嘘", "好き", "嫌い"].includes(jp)) multiplier *= 0.55;
+  if (meaningText.includes("hiragana") || meaningText.includes("yes") || meaningText.includes("no")) {
+    multiplier *= 0.45;
+  }
+
+  if (kanjiCount >= 3) multiplier *= 1.2;
+  if (kanjiCount >= 4 || charCount >= 5) multiplier *= 1.35;
+  if (/[々]/.test(jp)) multiplier *= 1.12;
+  if (meaningText.includes("idiom") || meaningText.includes("proverb")) multiplier *= 1.5;
+  if (meaningText.includes("sorcery") || meaningText.includes("demon") || meaningText.includes("causality")) {
+    multiplier *= 1.28;
+  }
+  if (meaningText.includes("concept") || meaningText.includes("abstraction") || meaningText.includes("ethics")) {
+    multiplier *= 1.18;
+  }
+  if (level === "Beyond N1") multiplier *= 1.12;
+
+  return Math.round(clamp(baseRank * multiplier, 1, 30000));
+}
 
 const defaultState = {
   rating: 950,
@@ -1380,12 +1876,19 @@ const defaultState = {
   answered: 0,
   correct: 0,
   scoreTotal: 0,
+  readingAnswered: 0,
   readingScoreTotal: 0,
   history: [],
-  seen: {}
+  seen: {},
+  streak: 0,
+  bestStreak: 0,
+  achievements: {}
 };
 
 const minimumEstimateAnswers = 10;
+const reliableEstimateAnswers = 60;
+const minRating = estimateBands[0].minRating;
+const maxRating = estimateBands[estimateBands.length - 1].maxRating;
 const calibrationLabel = "Calibrating";
 const storageKey = "japanese-vocab-frequency-elo-profile-v3";
 let state = loadState();
@@ -1398,10 +1901,14 @@ const els = {
   kanjiRatingValue: document.querySelector("#kanjiRatingValue"),
   kanjiDeltaValue: document.querySelector("#kanjiDeltaValue"),
   kanjiBandValue: document.querySelector("#kanjiBandValue"),
+  kanjiCoverageValue: document.querySelector("#kanjiCoverageValue"),
   bandValue: document.querySelector("#bandValue"),
   confidenceValue: document.querySelector("#confidenceValue"),
+  calibrationHint: document.querySelector("#calibrationHint"),
+  achievementStack: document.querySelector("#achievementStack"),
   wordLevel: document.querySelector("#wordLevel"),
   wordRating: document.querySelector("#wordRating"),
+  coverageValue: document.querySelector("#coverageValue"),
   cardPrompt: document.querySelector("#cardPrompt"),
   japaneseWord: document.querySelector("#japaneseWord"),
   reading: document.querySelector("#reading"),
@@ -1433,9 +1940,15 @@ const els = {
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey));
-    return { ...defaultState, ...saved };
+    return {
+      ...defaultState,
+      ...saved,
+      achievements: saved?.achievements || {},
+      history: saved?.history || [],
+      seen: saved?.seen || {}
+    };
   } catch {
-    return { ...defaultState };
+    return { ...defaultState, achievements: {}, history: [], seen: {} };
   }
 }
 
@@ -1451,7 +1964,7 @@ function ratingDelta(word, score, rating = state.rating) {
   const kFactor =
     state.answered < minimumEstimateAnswers
       ? 210 - state.answered * 10
-      : Math.max(16, 48 - state.answered * 0.55);
+      : Math.max(20, 58 - (state.answered - minimumEstimateAnswers) * 0.16);
   return Math.round(kFactor * (score - expectedScore(rating, word.rating)));
 }
 
@@ -1468,12 +1981,16 @@ function estimateFromRating(rating) {
     1
   );
   const estimatedWords = Math.round(band.minWords + (band.maxWords - band.minWords) * progress);
+  const estimatedCoverage = coverageFromKnownWords(estimatedWords);
   const spread = confidenceSpread(state.answered);
   return {
     band,
     estimatedWords,
+    estimatedCoverage,
     low: Math.max(0, Math.round(estimatedWords * (1 - spread))),
-    high: Math.round(estimatedWords * (1 + spread))
+    high: Math.round(estimatedWords * (1 + spread)),
+    lowCoverage: coverageFromKnownWords(Math.max(0, estimatedWords * (1 - spread))),
+    highCoverage: coverageFromKnownWords(estimatedWords * (1 + spread))
   };
 }
 
@@ -1492,26 +2009,84 @@ function ratingForKnownWords(wordsKnown) {
   return Math.round(band.minRating + (band.maxRating - band.minRating) * progress);
 }
 
+function maxKnownWords() {
+  return estimateBands[estimateBands.length - 1].maxWords;
+}
+
 function confidenceSpread(answered) {
-  if (answered < 8) return 0.45;
-  if (answered < 20) return 0.3;
-  if (answered < 40) return 0.2;
-  return 0.12;
+  if (answered < minimumEstimateAnswers) return 0.65;
+  if (answered < 25) return 0.5;
+  if (answered < 60) return 0.35;
+  if (answered < 120) return 0.24;
+  if (answered < 250) return 0.16;
+  return 0.1;
+}
+
+function coverageFromKnownWords(wordsKnown) {
+  const words = clamp(Math.max(1, wordsKnown), 1, maxKnownWords());
+  if (words <= coverageAnchors[0].words) {
+    const first = coverageAnchors[0];
+    return clamp((words / first.words) * first.coverage, 0, first.coverage);
+  }
+
+  for (let index = 0; index < coverageAnchors.length - 1; index += 1) {
+    const from = coverageAnchors[index];
+    const to = coverageAnchors[index + 1];
+    if (words <= to.words) {
+      return interpolateLogCoverage(words, from, to);
+    }
+  }
+
+  return 100;
+}
+
+function interpolateLogCoverage(words, from, to) {
+  const progress =
+    (Math.log(words) - Math.log(from.words)) / Math.max(0.0001, Math.log(to.words) - Math.log(from.words));
+  return from.coverage + (to.coverage - from.coverage) * clamp(progress, 0, 1);
 }
 
 function pickWord() {
   const targetRating = samplingRating();
-  const ratedWords = words.map((word) => {
+  const pool = nearbyWords(targetRating);
+  const ratedWords = pool.map((word) => {
     const timesSeen = state.seen[word.jp] || 0;
     const distance = Math.abs(word.rating - targetRating);
     const repeatPenalty = timesSeen * 150;
-    const exploration = Math.random() * 120;
+    const exploration = Math.random() * explorationRange();
     return { word, score: distance + repeatPenalty - exploration };
   });
 
   ratedWords.sort((a, b) => a.score - b.score);
   const shortlist = ratedWords.slice(0, Math.min(12, ratedWords.length));
   return shortlist[Math.floor(Math.random() * shortlist.length)].word;
+}
+
+function nearbyWords(targetRating) {
+  const center = lowerBoundByRating(targetRating);
+  const radius = state.answered < reliableEstimateAnswers ? 620 : 420;
+  const start = Math.max(0, center - radius);
+  const end = Math.min(wordsByRating.length, center + radius);
+  return wordsByRating.slice(start, end);
+}
+
+function lowerBoundByRating(targetRating) {
+  let low = 0;
+  let high = wordsByRating.length;
+  while (low < high) {
+    const mid = Math.floor((low + high) / 2);
+    if (wordsByRating[mid].rating < targetRating) low = mid + 1;
+    else high = mid;
+  }
+  return low;
+}
+
+function explorationRange() {
+  if (state.answered < minimumEstimateAnswers) return 260;
+  if (state.answered < 40) return 240;
+  if (state.answered < 100) return 200;
+  if (state.answered < 250) return 155;
+  return 110;
 }
 
 function samplingRating() {
@@ -1525,24 +2100,26 @@ function samplingRating() {
   const momentum = lastAnswerWasCorrect ? 260 : -180;
   const performancePush = (accuracy - 0.5) * 1100;
   const calibrationPush = progress * 420;
-  return clamp(state.rating + performancePush + calibrationPush + momentum, 350, 3400);
+  return clamp(state.rating + performancePush + calibrationPush + momentum, minRating, maxRating);
 }
 
 function showNextWord() {
   currentWord = pickWord();
-  currentReadingKnown = null;
+  const asksReading = hasKanjiQuestion(currentWord);
+  currentReadingKnown = asksReading ? null : undefined;
   els.japaneseWord.textContent = currentWord.jp;
-  els.reading.textContent = currentWord.reading;
+  els.japaneseWord.classList.toggle("kana-only", isKanaOnly(currentWord.jp));
+  els.reading.textContent = currentWord.reading || "No kanji-reading check for this card";
   els.meaning.textContent = currentWord.meaning;
-  els.cardPrompt.textContent = "Can you read this word?";
+  els.cardPrompt.textContent = asksReading ? "Can you read this word?" : "Do you know this word?";
   els.wordRating.textContent = `~ top ${formatNumber(currentWord.frequencyRank)} word · rating ${currentWord.rating}`;
   els.wordLevel.textContent = difficultyLabel(currentWord.rating);
   els.meaning.classList.add("hidden");
-  els.reading.classList.add("hidden");
-  els.readingRevealActions.classList.remove("hidden");
+  els.reading.classList.toggle("hidden", asksReading);
+  els.readingRevealActions.classList.toggle("hidden", !asksReading);
   els.readingActions.classList.add("hidden");
   els.answerActions.classList.add("hidden");
-  els.mainActions.classList.add("hidden");
+  els.mainActions.classList.toggle("hidden", asksReading);
   render();
 }
 
@@ -1558,23 +2135,33 @@ function bandLabel(rating) {
 
 function confidenceLabel(answered) {
   if (answered < minimumEstimateAnswers) return "Low";
-  if (answered < 20) return "Building";
-  if (answered < 40) return "Good";
-  return "Settling";
+  if (answered < 30) return "Early estimate";
+  if (answered < reliableEstimateAnswers) return "Building";
+  if (answered < 120) return "Settling";
+  if (answered < 250) return "Good";
+  return "High";
 }
 
 function answer(knewMeaning) {
   const score = knewMeaning ? 1 : 0;
   const combinedScore = answerScore(currentReadingKnown, knewMeaning);
   const delta = ratingDelta(currentWord, score);
-  const kanjiDelta = ratingDelta(currentWord, currentReadingKnown ? 1 : 0, state.kanjiRating);
+  const asksReading = hasKanjiQuestion(currentWord);
+  const kanjiDelta = asksReading ? ratingDelta(currentWord, currentReadingKnown ? 1 : 0, state.kanjiRating) : 0;
   const oldRating = state.rating;
   const oldKanjiRating = state.kanjiRating;
-  state.rating = Math.min(3400, Math.max(350, state.rating + delta));
-  state.kanjiRating = Math.min(3400, Math.max(350, state.kanjiRating + kanjiDelta));
+  state.rating = clamp(state.rating + delta, minRating, maxRating);
+  if (asksReading) {
+    state.kanjiRating = clamp(state.kanjiRating + kanjiDelta, minRating, maxRating);
+  }
   state.answered += 1;
   state.scoreTotal = (state.scoreTotal || 0) + score;
-  state.readingScoreTotal = (state.readingScoreTotal || 0) + (currentReadingKnown ? 1 : 0);
+  state.streak = knewMeaning ? (state.streak || 0) + 1 : 0;
+  state.bestStreak = Math.max(state.bestStreak || 0, state.streak);
+  if (asksReading) {
+    state.readingAnswered = (state.readingAnswered || 0) + 1;
+    state.readingScoreTotal = (state.readingScoreTotal || 0) + (currentReadingKnown ? 1 : 0);
+  }
   state.correct = state.scoreTotal;
   if (state.answered === minimumEstimateAnswers && state.scoreTotal === 0) {
     state.rating = estimateBands[0].minRating;
@@ -1582,10 +2169,10 @@ function answer(knewMeaning) {
   if (state.answered === minimumEstimateAnswers && state.scoreTotal === minimumEstimateAnswers) {
     state.rating = estimateBands[estimateBands.length - 1].minRating;
   }
-  if (state.answered === minimumEstimateAnswers && state.readingScoreTotal === 0) {
+  if (state.readingAnswered === minimumEstimateAnswers && state.readingScoreTotal === 0) {
     state.kanjiRating = estimateBands[0].minRating;
   }
-  if (state.answered === minimumEstimateAnswers && state.readingScoreTotal === minimumEstimateAnswers) {
+  if (state.readingAnswered === minimumEstimateAnswers && state.readingScoreTotal === minimumEstimateAnswers) {
     state.kanjiRating = estimateBands[estimateBands.length - 1].minRating;
   }
   state.seen[currentWord.jp] = (state.seen[currentWord.jp] || 0) + 1;
@@ -1595,6 +2182,7 @@ function answer(knewMeaning) {
     level: currentWord.level,
     knewReading: currentReadingKnown,
     knewMeaning,
+    source: currentWord.source,
     score: combinedScore,
     vocabScore: score,
     delta,
@@ -1605,15 +2193,92 @@ function answer(knewMeaning) {
     kanjiTo: state.kanjiRating
   });
   state.history = state.history.slice(0, 8);
+  checkAchievements({ knewMeaning, knewReading: currentReadingKnown, asksReading });
   saveState();
   showNextWord();
 }
 
 function answerScore(knewReading, knewMeaning) {
+  if (knewReading === undefined) return knewMeaning ? 1 : 0;
   if (knewReading && knewMeaning) return 1;
   if (!knewReading && knewMeaning) return 0.7;
   if (knewReading && !knewMeaning) return 0.35;
   return 0;
+}
+
+function checkAchievements(result) {
+  const achievements = [
+    {
+      id: "first-round",
+      title: "First Drop",
+      detail: "You entered the vocabulary ladder.",
+      unlocked: () => state.answered >= 1
+    },
+    {
+      id: "first-correct",
+      title: "Confirmed Hit",
+      detail: "First known word locked in.",
+      unlocked: () => result.knewMeaning
+    },
+    {
+      id: "first-reading",
+      title: "Kanji Read",
+      detail: "First kanji reading cleared.",
+      unlocked: () => result.asksReading && result.knewReading === true
+    },
+    {
+      id: "rank-online",
+      title: "Rank Online",
+      detail: "Calibration complete. Your Elo is live.",
+      unlocked: () => state.answered >= minimumEstimateAnswers
+    },
+    {
+      id: "streak-5",
+      title: "Hot Streak",
+      detail: "5 words correct in a row.",
+      unlocked: () => state.streak >= 5
+    },
+    {
+      id: "streak-10",
+      title: "Rampage",
+      detail: "10 words correct in a row.",
+      unlocked: () => state.streak >= 10
+    },
+    {
+      id: "kanji-10",
+      title: "Reader Mode",
+      detail: "10 kanji readings answered correctly.",
+      unlocked: () => (state.readingScoreTotal || 0) >= 10
+    }
+  ];
+
+  for (const achievement of achievements) {
+    if (!state.achievements[achievement.id] && achievement.unlocked()) {
+      state.achievements[achievement.id] = new Date().toISOString();
+      showAchievement(achievement);
+    }
+  }
+}
+
+function showAchievement(achievement) {
+  if (!els.achievementStack) return;
+  const toast = document.createElement("div");
+  toast.className = "achievement-toast";
+  toast.innerHTML = `
+    <span>Achievement unlocked</span>
+    <strong>${achievement.title}</strong>
+    <p>${achievement.detail}</p>
+  `;
+  els.achievementStack.append(toast);
+  window.setTimeout(() => {
+    toast.classList.add("leaving");
+    window.setTimeout(() => toast.remove(), 280);
+  }, 4200);
+}
+
+function clearAchievementToasts() {
+  if (!els.achievementStack) return;
+  els.achievementStack.innerHTML = "";
 }
 
 function answerReading(knewReading) {
@@ -1635,28 +2300,48 @@ function render() {
   const estimate = estimateFromRating(state.rating);
   const kanjiEstimate = estimateFromRating(state.kanjiRating);
   const canEstimate = state.answered >= minimumEstimateAnswers;
+  const canEstimateKanji = (state.readingAnswered || 0) >= minimumEstimateAnswers;
   els.ratingValue.textContent = canEstimate ? state.rating : calibrationLabel;
-  els.kanjiRatingValue.textContent = canEstimate ? state.kanjiRating : calibrationLabel;
+  els.kanjiRatingValue.textContent = canEstimateKanji ? state.kanjiRating : calibrationLabel;
   renderDelta(els.ratingDeltaValue, "delta");
   renderDelta(els.kanjiDeltaValue, "kanjiDelta");
-  els.bandValue.textContent = canEstimate ? bandLabel(state.rating) : calibrationLabel;
-  els.kanjiBandValue.textContent = canEstimate ? bandLabel(state.kanjiRating) : calibrationLabel;
+  renderRankValue(els.bandValue, estimate, canEstimate);
+  renderRankValue(els.kanjiBandValue, kanjiEstimate, canEstimateKanji);
   els.confidenceValue.textContent = confidenceLabel(state.answered);
+  els.calibrationHint.classList.toggle("hidden", canEstimate);
+  els.calibrationHint.textContent = `Play ${minimumEstimateAnswers - state.answered} more ${
+    minimumEstimateAnswers - state.answered === 1 ? "round" : "rounds"
+  } to show your rank`;
   els.knownWordsValue.textContent = canEstimate ? formatNumber(estimate.estimatedWords) : calibrationLabel;
-  els.readableWordsValue.textContent = canEstimate
+  els.coverageValue.textContent = canEstimate ? formatCoverage(estimate.estimatedCoverage) : calibrationLabel;
+  els.readableWordsValue.textContent = canEstimateKanji
     ? formatNumber(kanjiEstimate.estimatedWords)
     : calibrationLabel;
+  els.kanjiCoverageValue.textContent = canEstimateKanji
+    ? formatCoverage(kanjiEstimate.estimatedCoverage)
+    : calibrationLabel;
   els.rangeValue.textContent = canEstimate
-    ? `${formatNumber(estimate.low)}-${formatNumber(estimate.high)} word range`
+    ? `${formatNumber(estimate.low)}-${formatNumber(estimate.high)} words · ${formatCoverage(
+        estimate.lowCoverage
+      )}-${formatCoverage(estimate.highCoverage)} coverage`
     : `Answer ${minimumEstimateAnswers - state.answered} more to estimate`;
   els.answeredValue.textContent = `${state.answered} answered`;
   els.accuracyBar.style.width = `${accuracy}%`;
   els.accuracyValue.textContent =
     state.answered === 0 ? "No answers yet" : `${accuracy}% correct this session`;
-  els.wordBankValue.textContent = `${words.length} leveled seed words`;
+  els.wordBankValue.textContent = `${formatNumber(words.length)} quiz words`;
   renderScale(canEstimate);
-  renderProfile(accuracy, estimate, kanjiEstimate, canEstimate);
+  renderProfile(accuracy, estimate, kanjiEstimate, canEstimate, canEstimateKanji);
   renderHistory();
+}
+
+function renderRankValue(target, estimate, canEstimate) {
+  target.textContent = canEstimate ? estimate.band.level : calibrationLabel;
+  target.className = "rank-value";
+  target.parentElement.className = "rank-stat";
+  const strip = target.closest(".rating-strip");
+  const baseClass = strip.classList.contains("kanji-strip") ? "rating-strip kanji-strip" : "rating-strip";
+  strip.className = canEstimate ? `${baseClass} tier-${estimate.band.tier}` : baseClass;
 }
 
 function renderDelta(target, key) {
@@ -1668,6 +2353,11 @@ function renderDelta(target, key) {
   }
 
   const value = last[key];
+  if (key === "kanjiDelta" && last.knewReading === undefined) {
+    target.className = "rating-delta hidden";
+    target.textContent = "";
+    return;
+  }
   const sign = value > 0 ? "+" : "";
   target.className = `rating-delta ${value >= 0 ? "plus" : "minus"}`;
   target.textContent = `${sign}${value}`;
@@ -1677,7 +2367,7 @@ function renderScale(canEstimate) {
   els.levelScale.innerHTML = "";
   for (const band of estimateBands) {
     const marker = document.createElement("div");
-    marker.className = "scale-row";
+    marker.className = `scale-row tier-${band.tier}`;
     const bandIndex = estimateBands.indexOf(band);
     const isLast = bandIndex === estimateBands.length - 1;
     const isCurrent =
@@ -1691,19 +2381,30 @@ function renderScale(canEstimate) {
   }
 }
 
-function renderProfile(accuracy, estimate, kanjiEstimate, canEstimate) {
+function renderProfile(accuracy, estimate, kanjiEstimate, canEstimate, canEstimateKanji) {
   els.profileOutput.value = JSON.stringify(
     {
       rating: canEstimate ? state.rating : null,
-      kanjiRating: canEstimate ? state.kanjiRating : null,
-      kanjiLevelEstimate: canEstimate ? bandLabel(state.kanjiRating) : calibrationLabel,
-      estimatedReadableWords: canEstimate ? kanjiEstimate.estimatedWords : null,
-      estimatedReadableRange: canEstimate ? [kanjiEstimate.low, kanjiEstimate.high] : null,
+      kanjiRating: canEstimateKanji ? state.kanjiRating : null,
+      kanjiLevelEstimate: canEstimateKanji ? bandLabel(state.kanjiRating) : calibrationLabel,
+      estimatedReadableWords: canEstimateKanji ? kanjiEstimate.estimatedWords : null,
+      estimatedReadableRange: canEstimateKanji ? [kanjiEstimate.low, kanjiEstimate.high] : null,
+      estimatedReadableCoverage: canEstimateKanji ? kanjiEstimate.estimatedCoverage : null,
+      estimatedReadableCoverageRange: canEstimateKanji
+        ? [kanjiEstimate.lowCoverage, kanjiEstimate.highCoverage]
+        : null,
       levelEstimate: canEstimate ? bandLabel(state.rating) : calibrationLabel,
       estimatedKnownWords: canEstimate ? estimate.estimatedWords : null,
       estimatedRange: canEstimate ? [estimate.low, estimate.high] : null,
+      estimatedCoverage: canEstimate ? estimate.estimatedCoverage : null,
+      estimatedCoverageRange: canEstimate ? [estimate.lowCoverage, estimate.highCoverage] : null,
       answered: state.answered,
+      readingAnswered: state.readingAnswered || 0,
+      currentStreak: state.streak || 0,
+      bestStreak: state.bestStreak || 0,
+      achievements: Object.keys(state.achievements || {}),
       minimumEstimateAnswers,
+      reliableEstimateAnswers,
       accuracy: state.answered === 0 ? null : accuracy,
       confidence: confidenceLabel(state.answered),
       wordBankSize: words.length
@@ -1727,11 +2428,14 @@ function renderHistory() {
     const row = document.createElement("li");
     const word = document.createElement("span");
     const result = document.createElement("span");
-    const readingMark = item.knewReading ? "R+" : "R-";
+    const readingMark = item.knewReading === undefined ? "R skipped" : item.knewReading ? "R+" : "R-";
     const meaningMark = item.knewMeaning ? "M+" : "M-";
     word.textContent = `${item.jp} (${readingMark}/${meaningMark}) · ${item.meaning}`;
     result.className = item.delta >= 0 ? "result-good" : "result-miss";
-    result.textContent = `V ${item.delta > 0 ? "+" : ""}${item.delta} · K ${item.kanjiDelta > 0 ? "+" : ""}${item.kanjiDelta}`;
+    result.textContent =
+      item.knewReading === undefined
+        ? `V ${item.delta > 0 ? "+" : ""}${item.delta}`
+        : `V ${item.delta > 0 ? "+" : ""}${item.delta} · K ${item.kanjiDelta > 0 ? "+" : ""}${item.kanjiDelta}`;
     row.append(word, result);
     els.historyList.append(row);
   }
@@ -1739,6 +2443,10 @@ function renderHistory() {
 
 function formatNumber(value) {
   return new Intl.NumberFormat("en-US").format(value);
+}
+
+function formatCoverage(value) {
+  return `${Number(value).toFixed(value >= 10 ? 1 : 2)}%`;
 }
 
 function clamp(value, min, max) {
@@ -1758,7 +2466,8 @@ els.knowButton.addEventListener("click", () => answer(true));
 els.missButton.addEventListener("click", () => answer(false));
 
 els.resetButton.addEventListener("click", () => {
-  state = { ...defaultState, history: [], seen: {} };
+  state = { ...defaultState, achievements: {}, history: [], seen: {} };
+  clearAchievementToasts();
   saveState();
   showNextWord();
 });
