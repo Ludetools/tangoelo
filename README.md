@@ -17,3 +17,5 @@ So you may find "easy" words that have a high rarity, and "difficult" words with
 
 The estimations of vocab and kanji count are not to be taken too seriously.
 I've tried my best to make them represenative and give a decent ballpark estimate, but in the end this app is intended as entertainment.
+
+***Disclaimer: This app was coded using Codex***
